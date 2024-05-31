@@ -1,6 +1,3 @@
-
-
-
 import 'dart:convert';
 
 import 'package:btds_mobile/Auth/Authentication.dart';
@@ -14,8 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:btds_mobile/data/my_colors.dart';
 import 'package:btds_mobile/widget/my_text.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:http/http.dart' as http;
 
 import '../Darshboard/Diagonise.dart';
@@ -28,9 +23,8 @@ class LogInPage extends StatefulWidget {
 }
 
 class _LogInPageState extends State<LogInPage> {
-
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController phonenumber = TextEditingController();
+  final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   bool obscureText = true;
   bool _isLoading = false;
@@ -47,9 +41,9 @@ class _LogInPageState extends State<LogInPage> {
     return emailRegex.hasMatch(email);
   }
 
- loginUser() async {
+  loginUser() async {
     Map<String, dynamic> toJson = {
-      'phonenumber': phonenumber.text.toString(),
+      'phonenumber': email.text.toString(),
       'password': password.text.toString()
     };
     try {
@@ -78,7 +72,7 @@ class _LogInPageState extends State<LogInPage> {
       snackbar.displaymessage(context, 'An Error occured', false);
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,25 +95,23 @@ class _LogInPageState extends State<LogInPage> {
                   children: [
                     Container(
                       child: Image.asset(
-                                    Img.get('BT2-01.png'),
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                    color: Colors.white,
-                                  ),
+                        Img.get('BT2-01.png'),
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        color: Colors.white,
+                      ),
                     ),
-                    SizedBox(width:20),
-                     Text(
-                  "Login",
-                  style: MyText.headline(context)!.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                    SizedBox(width: 20),
+                    Text(
+                      "Login",
+                      style: MyText.headline(context)!.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
-           
-               ),
-               
+                ),
                 Container(
                   height: 10,
                 ),
@@ -137,95 +129,145 @@ class _LogInPageState extends State<LogInPage> {
       body: SingleChildScrollView(
         child: Container(
             padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 20,
-                ),
-                TextField(
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    hintText: "Enter your email",
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 20,
                   ),
-                ),
-                Container(
-                  height: 20,
-                ),
-                TextField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    hintText: "Enter your password",
-                  ),
-                ),
-                Container(
-                  height: 5,
-                ),
-                Row(children: [
-                  Checkbox(
-                    value: false,
-                    onChanged: (value) {},
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  Text(
-                    "Remember me",
-                    style: MyText.body1(context)!
-                        .copyWith(color: Colors.grey[600]),
-                  ),
-                ]),
-                Container(
-                  height: 20,   
-                ),
-                Container(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Get.to(() => Diagonise());
+                  TextFormField(
+                    keyboardType: TextInputType.text,
+                    controller: email,
+                    style: TextStyle(fontSize: 16),
+                    decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Email',
+                        hintStyle: TextStyle(fontSize: 16),
+                        suffixIcon: Icon(Icons.email)),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the phone number';
+                      }
+                       if (!isValidEmail(email.text)) {
+                        return 'Enter valid Email';
+                      }
+                      return null;
                     },
-                    child: Text(
-                      "Login",
+                  ),
+                  Container(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    //  keyboardType: TextInputType.,
+                    obscureText: obscureText,
+                    controller: password,
+                    style: TextStyle(fontSize: 16),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: 'Password',
+                      hintStyle: TextStyle(fontSize: 16),
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              obscureText = !obscureText;
+                            });
+                          },
+                          icon: Icon(obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility)),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: MyColors.accent,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(10),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the password';
+                      }
+                      return null;
+                    },
+                  ),
+                  Container(
+                    height: 5,
+                  ),
+                  Row(children: [
+                    Checkbox(
+                      value: false,
+                      onChanged: (value) {},
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    Text(
+                      "Remember me",
+                      style: MyText.body1(context)!
+                          .copyWith(color: Colors.grey[600]),
+                    ),
+                  ]),
+                  Container(
+                    height: 20,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          await loginUser();
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          if (login) {
+                            await newuser.storeuid(userRecord['userid']);
+                            userdetails.SetEmail = userRecord['email'];
+                            userdetails.SetPhonenumber =
+                                userRecord['email'];
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Diagonise()));
+                          }
+                        }
+                      },
+                      child: Text(
+                        "Login",
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: MyColors.accent,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(10),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                 Container(
-                  height: 20,   
-                ),
-                 GestureDetector(
-                  onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SignPForm()));
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Notyet a member? ',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  'SignUp',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: MyColors.accent,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                )
-              ],
+                  Container(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Get.to(() => SignPForm());
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Notyet a member? ',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          'SignUp',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: MyColors.accent,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             )),
       ),
     );
