@@ -27,6 +27,9 @@ dependencies:
   path: ^1.8.3
   cached_network_image: ^3.2.2
   html: ^0.15.0
+  path_provider: ^2.0.11
+  pdf: ^3.3.0
+  csv: ^5.0.0
   webview_flutter: ^3.0.4
   flutter_test:
     sdk: flutter
