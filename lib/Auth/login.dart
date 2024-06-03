@@ -43,7 +43,7 @@ class _LogInPageState extends State<LogInPage> {
 
   loginUser() async {
     Map<String, dynamic> toJson = {
-      'phonenumber': email.text.toString(),
+      'email': email.text.toString(),
       'password': password.text.toString()
     };
     try {
@@ -149,7 +149,7 @@ class _LogInPageState extends State<LogInPage> {
                         suffixIcon: Icon(Icons.email)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter the phone number';
+                        return 'Please enter Email';
                       }
                        if (!isValidEmail(email.text)) {
                         return 'Enter valid Email';

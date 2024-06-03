@@ -59,14 +59,16 @@ class _SignPFormState extends State<SignPForm> {
       if (result.statusCode == 200) {
         var resbody = await jsonDecode(result.body);
         if (resbody['signup'] == true) {
+          snackbar.displaymessage(context, 'Registration Successfull', true);
           setState(() {
             signup = true;
           });
-          Fluttertoast.showToast(
-              msg: "congrats!! you are log in successfully.");
         } else {
-          Fluttertoast.showToast(msg: "An Error occured, try again.");
+          snackbar.displaymessage(context, 'An Error occured', false);
         }
+        
+      }else {
+        snackbar.displaymessage(context, 'An Error occured', false);
       }
     } catch (e) {
       snackbar.displaymessage(context, 'An Error occured', false);

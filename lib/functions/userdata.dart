@@ -1,4 +1,3 @@
-
 class UserData {
   int userid;
   String full_name;
@@ -25,3 +24,4 @@ class UserData {
         'password': password,
       };
 }
+

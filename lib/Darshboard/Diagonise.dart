@@ -1,10 +1,14 @@
+import 'dart:convert';
 
+import 'package:btds_mobile/Auth/Authentication.dart';
 import 'package:btds_mobile/data/drawerss.dart';
+import 'package:btds_mobile/functions/connection.dart';
+import 'package:btds_mobile/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:btds_mobile/data/my_colors.dart';
 import 'package:flutter/widgets.dart';
-
+import 'package:http/http.dart' as http;
 
 import 'dart:io';
 
@@ -20,11 +24,18 @@ class Diagonise extends StatefulWidget {
 }
 
 class _DiagoniseState extends State<Diagonise> {
- GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+  final _formKey = GlobalKey<FormState>();
+
+    final AuthenticationFunctions authFunctions = AuthenticationFunctions(); // Create an instance of AuthenticationFunctions
+
 
   File? filePath;
   String label = ' ';
   double confidence = 0.0;
+  final snackbar = Snackbar();
+  bool _isLoading = false;
+  bool results = false;
 
   Future<void> _tFliteInit() async {
     String? res = await Tflite.loadModel(
@@ -36,6 +47,32 @@ class _DiagoniseState extends State<Diagonise> {
         useGpuDelegate:
             false // defaults to false, set to true to use GPU delegate
         );
+  }
+
+  Future<void> storeResults(int userid, String label, double confidence) async {
+    final response = await http.post(
+      Uri.parse(API.results),
+      body: {
+        'userid': userid.toString(),
+        'label': label,
+        'confidence': confidence.toString(),
+      },
+    );
+
+    try {
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse['saved'] == 'success') {
+          devtools.log('Data stored successfully');
+        } else {
+          devtools.log('Failed to store data: ${jsonResponse['message']}');
+        }
+      } else {
+        devtools.log('Failed to store data');
+      }
+    } catch (e) {
+      snackbar.displaymessage(context, 'An Error occured', false);
+    }
   }
 
   pickImagecamera() async {
@@ -117,17 +154,17 @@ class _DiagoniseState extends State<Diagonise> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     backgroundColor: Colors.grey[400],
+      backgroundColor: Colors.grey[400],
       key: scaffoldKey,
       appBar: new AppBar(
-         backgroundColor: Colors.black,
-        
+        backgroundColor: Colors.black,
+
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.black,
           statusBarIconBrightness: Brightness.light,
         ),
         title: new Text("B T D S", style: TextStyle(color: Colors.white)),
-                leading: IconButton(
+        leading: IconButton(
           icon: Icon(Icons.menu, color: Colors.white),
           onPressed: () {
             scaffoldKey.currentState!.openDrawer();
@@ -175,7 +212,7 @@ class _DiagoniseState extends State<Diagonise> {
                           ),
                     //   Image.asset(
                     //   Img.get('brain-1.png'),
-
+        
                     //   fit: BoxFit.cover,
                     // ),
                   ),
@@ -239,9 +276,24 @@ class _DiagoniseState extends State<Diagonise> {
                       ],
                     ),
                   ),
+                   ElevatedButton(
+                        onPressed: () async {
+                          String? userId = await authFunctions.getuerid(); // Get the user ID
+                            int userid = int.parse(userId!);
+                            if (userid != null) {
+                              await storeResults(userid, label, confidence);
+                            } else {
+                              devtools.log('User not logged in');
+                            }
+                        },
+                        child: Text('Save Results'),
+                      ),
+                      Container(height:15),
                 ],
               ),
             ),
+        
+            
           ],
         ),
       ),

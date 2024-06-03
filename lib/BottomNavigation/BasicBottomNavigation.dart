@@ -16,7 +16,7 @@ class _BottomBarState extends State<BottomBar> {
   int _currentIndex = 0;
   List<Widget> bottomscreens = [
     Diagonise(),
-    Results(),
+    ResultsPage(),
     RegisterPatient()
   ];
   @override

@@ -110,7 +110,7 @@ Drawer Mydrawer(BuildContext context) {
             ),
              InkWell(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => Results()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ResultsPage()));
             },
             child: ListTile(
               leading: Icon(Icons.logout_sharp, color: Colors.white),
