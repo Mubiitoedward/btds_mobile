@@ -65,7 +65,7 @@ class _FirstPageState extends State<FirstPage> {
                     height: 5,
                   ),
                   Text(
-                    "Group25",
+                    "Group26",
                     style: MyText.body1(context)!.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

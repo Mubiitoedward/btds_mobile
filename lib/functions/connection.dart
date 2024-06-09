@@ -1,6 +1,5 @@
-
 class API {
-  static const hostConnect = "http://192.168.43.80/apiBTDS";
+  static const hostConnect = "http://www.wakagas.com/apiBTDS";
   static const hostConnectUser = "$hostConnect/user";
 
   static const signup = "$hostConnect/user/signup.php";

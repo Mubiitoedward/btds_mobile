@@ -1,12 +1,10 @@
 import 'dart:io';
-
 import 'package:btds_mobile/Auth/Authentication.dart';
 import 'package:btds_mobile/functions/connection.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:path_provider/path_provider.dart';
 
 class ResultsPage extends StatefulWidget {
@@ -17,8 +15,7 @@ class ResultsPage extends StatefulWidget {
 }
 
 class _ResultsPageState extends State<ResultsPage> {
-  final AuthenticationFunctions authFunctions =
-      AuthenticationFunctions(); // Create an instance of AuthenticationFunctions
+  final AuthenticationFunctions authFunctions = AuthenticationFunctions();
   List<Map<String, dynamic>> results = [];
   bool isLoading = true;
 
@@ -29,8 +26,7 @@ class _ResultsPageState extends State<ResultsPage> {
   }
 
   Future<void> fetchResults() async {
-    String? userId =
-        await authFunctions.getuerid(); // Get the user ID as a string
+    String? userId = await authFunctions.getuerid();
     print(userId);
     if (userId != null) {
       var response = await http.post(
@@ -50,7 +46,6 @@ class _ResultsPageState extends State<ResultsPage> {
           setState(() {
             isLoading = false;
           });
-          // Handle error
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(jsonResponse['message']),
           ));
@@ -59,7 +54,6 @@ class _ResultsPageState extends State<ResultsPage> {
         setState(() {
           isLoading = false;
         });
-        // Handle error
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Failed to load results'),
         ));
@@ -68,18 +62,15 @@ class _ResultsPageState extends State<ResultsPage> {
       setState(() {
         isLoading = false;
       });
-      // Handle error: user not logged in
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('User not logged in'),
       ));
     }
   }
 
-
   Future<void> downloadResults() async {
-    // Generate CSV
     List<List<dynamic>> rows = [];
-    rows.add(["Label", "Confidence", "Date"]); // Header row
+    rows.add(["Label", "Confidence", "Date"]); 
 
     for (var result in results) {
       List<dynamic> row = [];
@@ -91,15 +82,12 @@ class _ResultsPageState extends State<ResultsPage> {
 
     String csv = const ListToCsvConverter().convert(rows);
 
-    // Get the directory to save the file
     final directory = await getApplicationDocumentsDirectory();
     final path = "${directory.path}/results.csv";
 
-    // Write the CSV to a file
     final file = File(path);
     await file.writeAsString(csv);
 
-    // Display a message
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('Results downloaded: $path'),
     ));
@@ -109,38 +97,52 @@ class _ResultsPageState extends State<ResultsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Result Records'),
+        title: Text('Your Result Records', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black,
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : results.isEmpty
-              ? Center(child: Text('No records found'))
-              : Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                        itemCount: results.length,
-                        itemBuilder: (context, index) {
-                          final result = results[index];
-                          return ListTile(
-                            title: Text(result['label']),
-                            subtitle: Text(
-                                'Confidence: ${result['confidence']}%\nDate: ${result['recorded_at']}'),
-                          );
-                          
-                        },
-                        
+              ? Center(child: Text('No records found', style: TextStyle(fontSize: 18)))
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: results.length,
+                          itemBuilder: (context, index) {
+                            final result = results[index];
+                            return Card(
+                              margin: EdgeInsets.symmetric(vertical: 8),
+                              child: ListTile(
+                                title: Text(result['label'], style: TextStyle(fontWeight: FontWeight.bold)),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: 4),
+                                    Text('Confidence: ${result['confidence']}%', style: TextStyle(color: Colors.grey[600])),
+                                    Text('Date: ${result['recorded_at']}', style: TextStyle(color: Colors.grey[600])),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                  ),
-                   Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
+                      ElevatedButton.icon(
                         onPressed: downloadResults,
-                        child: Text('Download Results'),
+                        icon: Icon(Icons.download),
+                        label: Text('Download Results'),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          iconColor   : Colors.black,
+                          textStyle: TextStyle(fontSize: 16),
+                        ),
                       ),
-                    ),
-                ],
-              ),
+                    ],
+                  ),
+                ),
     );
   }
 }

@@ -190,18 +190,18 @@ class _LogInPageState extends State<LogInPage> {
                   Container(
                     height: 5,
                   ),
-                  Row(children: [
-                    Checkbox(
-                      value: false,
-                      onChanged: (value) {},
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    Text(
-                      "Remember me",
-                      style: MyText.body1(context)!
-                          .copyWith(color: Colors.grey[600]),
-                    ),
-                  ]),
+                  // Row(children: [
+                  //   Checkbox(
+                  //     value: false,
+                  //     onChanged: (value) {},
+                  //     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  //   ),
+                  //   Text(
+                  //     "Remember me",
+                  //     style: MyText.body1(context)!
+                  //         .copyWith(color: Colors.grey[600]),
+                  //   ),
+                  // ]),
                   Container(
                     height: 20,
                   ),

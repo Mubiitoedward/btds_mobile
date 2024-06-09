@@ -57,7 +57,9 @@ class _SignPFormState extends State<SignPForm> {
       var result =
           await http.post(Uri.parse(API.signup), body: userdata.toJson());
       if (result.statusCode == 200) {
+        print('4444444444444444444444');
         var resbody = await jsonDecode(result.body);
+
         if (resbody['signup'] == true) {
           snackbar.displaymessage(context, 'Registration Successfull', true);
           setState(() {
@@ -81,6 +83,7 @@ class _SignPFormState extends State<SignPForm> {
           body: {'email': email.text.toString()});
 
       if (result.statusCode == 200) {
+         print('333333333333333');
         var resbody = jsonDecode(result.body);
         if (resbody['emailfound'] == true) {
           Fluttertoast.showToast(msg: 'User already exists');
@@ -126,7 +129,7 @@ class _SignPFormState extends State<SignPForm> {
                         fillColor: Colors.white,
                         hintText: 'full name',
                         hintStyle: TextStyle(fontSize: 16),
-                        suffixIcon: Icon(Icons.near_me)),
+                        suffixIcon: Icon(Icons.person_2_outlined)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter the full name';

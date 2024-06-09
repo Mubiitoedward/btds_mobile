@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:btds_mobile/Auth/Authentication.dart';
 import 'package:btds_mobile/data/drawerss.dart';
 import 'package:btds_mobile/functions/connection.dart';
@@ -26,6 +26,17 @@ class Diagonise extends StatefulWidget {
 class _DiagoniseState extends State<Diagonise> {
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
   final _formKey = GlobalKey<FormState>();
+
+  List<Map<String, dynamic>> promos = [
+    {
+      'promo': 'Get your results instantly generated',
+      'image': 'assets/images/ActiveHumanBrain.png'
+    },
+    {
+      'promo': 'Get your brain image diagonised in just a click',
+      'image': 'assets/images/human-brain.png'
+    }
+  ];
 
     final AuthenticationFunctions authFunctions = AuthenticationFunctions(); // Create an instance of AuthenticationFunctions
 
@@ -163,7 +174,7 @@ class _DiagoniseState extends State<Diagonise> {
           statusBarColor: Colors.black,
           statusBarIconBrightness: Brightness.light,
         ),
-        title: new Text("B T D S", style: TextStyle(color: Colors.white)),
+        title: new Text("DIAGNOSIS PAGE", style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: Icon(Icons.menu, color: Colors.white),
           onPressed: () {
@@ -184,8 +195,93 @@ class _DiagoniseState extends State<Diagonise> {
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
+
+
+Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Container(
+                  color: Colors.blue,
+                  padding: EdgeInsets.only(bottom: 15, top: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Notifications',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.17,
+                        child: CarouselSlider(
+                            items: promos
+                                .map(
+                                  (item) => Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                          left: 10, right: 10, bottom: 5),
+                                      child: Row(
+                                        children: [
+                                          Flexible(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              // crossAxisAlignment:
+                                              //     CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  item['promo'],
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 15),
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Image.asset(
+                                            item['image'],
+                                            scale: 6,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            options: CarouselOptions(
+                                height: 200,
+                                autoPlay: true,
+                                enlargeCenterPage: true,
+                                aspectRatio: 16 / 9,
+                                autoPlayCurve: Curves.fastOutSlowIn,
+                                enableInfiniteScroll: true,
+                                autoPlayAnimationDuration:
+                                    const Duration(milliseconds: 800),
+                                autoPlayInterval: Duration(seconds: 3),
+                                viewportFraction: 0.8)),
+                      ),
+                    ],
+                  ),
+                )),
+
+
+
             Container(
-              height: 200,
+              height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
@@ -194,6 +290,10 @@ class _DiagoniseState extends State<Diagonise> {
               clipBehavior: Clip.antiAliasWithSaveLayer,
               child: Column(
                 children: [
+
+
+                  
+             
                   Container(
                     width: 280,
                     height: 280,

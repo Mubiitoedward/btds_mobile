@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "253838372232",
+    "project_id": "btds-mobile",
+    "storage_bucket": "btds-mobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253838372232:android:5548e77a6091aedc41de3d",
+        "android_client_info": {
+          "package_name": "com.example.btds_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOU-SjmtyqWS21ioXNPzo0nVT5Qu3Scm8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
