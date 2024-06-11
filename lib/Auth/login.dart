@@ -1,9 +1,8 @@
-import 'dart:convert';
-
-import 'package:btds_mobile/Auth/Authentication.dart';
+import 'package:btds_mobile/Auth/AuthService.dart';
+import 'package:btds_mobile/Auth/Forgotopassword.dart';
 import 'package:btds_mobile/Auth/signup.dart';
+import 'package:btds_mobile/Darshboard/darshboard.dart';
 import 'package:btds_mobile/data/img.dart';
-import 'package:btds_mobile/functions/connection.dart';
 import 'package:btds_mobile/snackbar.dart';
 import 'package:btds_mobile/userdetails.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:btds_mobile/data/my_colors.dart';
 import 'package:btds_mobile/widget/my_text.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-
-import '../Darshboard/Diagonise.dart';
 
 class LogInPage extends StatefulWidget {
   const LogInPage({Key? key}) : super(key: key);
@@ -24,13 +20,34 @@ class LogInPage extends StatefulWidget {
 
 class _LogInPageState extends State<LogInPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController email = TextEditingController();
-  final TextEditingController password = TextEditingController();
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _password = TextEditingController();
   bool obscureText = true;
   bool _isLoading = false;
   bool login = false;
-  final newuser = AuthenticationFunctions();
+  // final newuser = AuthenticationFunctions();
   final snackbar = Snackbar();
+
+  final _auth = AuthService();
+
+  // final _email = TextEditingController();
+  // final _password = TextEditingController();
+
+  _login() async {
+    final user =
+        await _auth.loginUserWithEmailAndPassword(_email.text, _password.text);
+
+    if (user != null) {
+      return "User Logged In";
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _email.dispose();
+    _password.dispose();
+  }
 
   Map<String, dynamic> userRecord = {};
   final userdetails = Get.put(UserDetails());
@@ -39,38 +56,6 @@ class _LogInPageState extends State<LogInPage> {
     final emailRegex = RegExp(
         r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$');
     return emailRegex.hasMatch(email);
-  }
-
-  loginUser() async {
-    Map<String, dynamic> toJson = {
-      'email': email.text.toString(),
-      'password': password.text.toString()
-    };
-    try {
-      var result = await http.post(Uri.parse(API.login), body: toJson);
-
-      if (result.statusCode == 200) {
-        print('llllllllllllll');
-        var resbody = jsonDecode(result.body);
-
-        bool account = resbody["accountfound"];
-
-        if (resbody['accountfound'] == true) {
-          snackbar.displaymessage(context, 'Logged in', true);
-          userRecord = resbody['user'];
-          print(userRecord);
-          setState(() {
-            login = true;
-          });
-        } else {
-          snackbar.displaymessage(context, 'An Error occured', false);
-        }
-      } else {
-        snackbar.displaymessage(context, 'An Error occured', false);
-      }
-    } catch (e) {
-      snackbar.displaymessage(context, 'An Error occured', false);
-    }
   }
 
   @override
@@ -139,7 +124,7 @@ class _LogInPageState extends State<LogInPage> {
                   ),
                   TextFormField(
                     keyboardType: TextInputType.text,
-                    controller: email,
+                    controller: _email,
                     style: TextStyle(fontSize: 16),
                     decoration: InputDecoration(
                         filled: true,
@@ -151,7 +136,7 @@ class _LogInPageState extends State<LogInPage> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter Email';
                       }
-                       if (!isValidEmail(email.text)) {
+                      if (!isValidEmail(_email.text)) {
                         return 'Enter valid Email';
                       }
                       return null;
@@ -163,7 +148,7 @@ class _LogInPageState extends State<LogInPage> {
                   TextFormField(
                     //  keyboardType: TextInputType.,
                     obscureText: obscureText,
-                    controller: password,
+                    controller: _password,
                     style: TextStyle(fontSize: 16),
                     decoration: InputDecoration(
                       filled: true,
@@ -188,20 +173,19 @@ class _LogInPageState extends State<LogInPage> {
                     },
                   ),
                   Container(
-                    height: 5,
+                    height: 20,
                   ),
-                  // Row(children: [
-                  //   Checkbox(
-                  //     value: false,
-                  //     onChanged: (value) {},
-                  //     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  //   ),
-                  //   Text(
-                  //     "Remember me",
-                  //     style: MyText.body1(context)!
-                  //         .copyWith(color: Colors.grey[600]),
-                  //   ),
-                  // ]),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                        foregroundColor: Colors.transparent),
+                    onPressed: () {
+                      Get.to(ForgotPasswordPage());
+                    },
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(color: MyColors.accent),
+                    ),
+                  ),
                   Container(
                     height: 20,
                   ),
@@ -213,20 +197,15 @@ class _LogInPageState extends State<LogInPage> {
                           setState(() {
                             _isLoading = true;
                           });
-                          await loginUser();
+                          await _login();
                           setState(() {
                             _isLoading = false;
                           });
-                          if (login) {
-                            await newuser.storeuid(userRecord['userid']);
-                            userdetails.SetEmail = userRecord['email'];
-                            userdetails.SetPhonenumber =
-                                userRecord['email'];
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Diagonise()));
-                          }
+
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Dashboard()));
                         }
                       },
                       child: Text(

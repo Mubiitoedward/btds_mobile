@@ -1,17 +1,10 @@
-//import 'dart:html';
-
-import 'dart:convert';
-
 import 'package:btds_mobile/Auth/login.dart';
 import 'package:btds_mobile/Darshboard/Diagonise.dart';
-import 'package:btds_mobile/functions/connection.dart';
-import 'package:btds_mobile/functions/userdata.dart';
 import 'package:btds_mobile/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:btds_mobile/Auth/AuthService.dart';
 import 'package:btds_mobile/data/my_colors.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
 
 class SignPForm extends StatefulWidget {
   const SignPForm({Key? key}) : super(key: key);
@@ -22,80 +15,67 @@ class SignPForm extends StatefulWidget {
 
 class _SignPFormState extends State<SignPForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController full_name = TextEditingController();
-  final TextEditingController user_name = TextEditingController();
-  final TextEditingController email = TextEditingController();
-  final TextEditingController phonenumber = TextEditingController();
-  final TextEditingController password = TextEditingController();
-  final TextEditingController confirmpassword = TextEditingController();
-  final snackbar = Snackbar();
-  bool obscureText = true; 
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final Snackbar snackbar = Snackbar();
+
+  final AuthService _auth = AuthService();
+  bool obscureText = true;
   bool _isLoading = false;
-  bool signup = false;
 
   bool isValidEmail(String email) {
-    // Use a regular expression to validate the email format
-    final emailRegex = RegExp(
-        r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$');
+    final emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$');
     return emailRegex.hasMatch(email);
   }
 
-  bool isPasswordConfirmed(String password, String confirmpassword) {
-    return password == confirmpassword;
+  bool isPasswordConfirmed(String password, String confirmPassword) {
+    return password == confirmPassword;
   }
 
-  registerUser() async {
-    UserData userdata = UserData(
-      1,
-      full_name.text.trim(),
-      user_name.text.trim(),
-      email.text.trim(),
-      phonenumber.text.trim(),
-      password.text.trim(),
-    );
+  Future<void> _signup() async {
     try {
-      var result =
-          await http.post(Uri.parse(API.signup), body: userdata.toJson());
-      if (result.statusCode == 200) {
-        print('4444444444444444444444');
-        var resbody = await jsonDecode(result.body);
-
-        if (resbody['signup'] == true) {
-          snackbar.displaymessage(context, 'Registration Successfull', true);
-          setState(() {
-            signup = true;
-          });
-        } else {
-          snackbar.displaymessage(context, 'An Error occured', false);
-        }
-        
-      }else {
-        snackbar.displaymessage(context, 'An Error occured', false);
-      }
-    } catch (e) {
-      snackbar.displaymessage(context, 'An Error occured', false);
-    }
-  }
-
-  validateEmail() async {
-    try {
-      var result = await http.post(Uri.parse(API.validateEmail),
-          body: {'email': email.text.toString()});
-
-      if (result.statusCode == 200) {
-         print('333333333333333');
-        var resbody = jsonDecode(result.body);
-        if (resbody['emailfound'] == true) {
-          Fluttertoast.showToast(msg: 'User already exists');
-        } else {
-          await registerUser();
-        }
+      final user = await _auth.createUserWithEmailAndPassword(
+        _fullNameController.text,
+        _userNameController.text,
+        _ageController.text,
+        _emailController.text,
+        _phoneNumberController.text,
+        _passwordController.text,
+        _confirmPasswordController.text,
+      );
+      if (user != null) {
+        snackbar.displaymessage(context, 'User Created Successfully', true);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Diagonise()),
+        );
       } else {
-        print('ERRRROOOOOOORRRRRRR');
+        snackbar.displaymessage(context, 'Sign Up Failed', false);
       }
     } catch (e) {
-      print(e.toString());
+      snackbar.displaymessage(context, 'Error: $e', false);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
+  }
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _userNameController.dispose();
+    _ageController.dispose();
+    _emailController.dispose();
+    _phoneNumberController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -111,234 +91,233 @@ class _SignPFormState extends State<SignPForm> {
       ),
       body: SingleChildScrollView(
         child: Container(
-            padding: EdgeInsets.all(20),
-            child: Form(
-               key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 20,
+          padding: EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 20),
+                TextFormField(
+                  keyboardType: TextInputType.text,
+                  controller: _fullNameController,
+                  style: TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Full Name',
+                    hintStyle: TextStyle(fontSize: 16),
+                    suffixIcon: Icon(Icons.person_2_outlined),
                   ),
-                  TextFormField(
-                    keyboardType: TextInputType.text,
-                    controller: full_name,
-                    style: TextStyle(fontSize: 16),
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: 'full name',
-                        hintStyle: TextStyle(fontSize: 16),
-                        suffixIcon: Icon(Icons.person_2_outlined)),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the full name';
-                      }
-                      return null;
-                    },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the full name';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  keyboardType: TextInputType.text,
+                  controller: _userNameController,
+                  style: TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Your Username',
+                    hintStyle: TextStyle(fontSize: 16),
+                    suffixIcon: Icon(Icons.person),
                   ),
-                  Container(
-                    height: 20,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the username';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  keyboardType: TextInputType.number,
+                  controller: _ageController,
+                  style: TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Age',
+                    hintStyle: TextStyle(fontSize: 16),
+                    suffixIcon: Icon(Icons.lock_clock_outlined),
                   ),
-                  TextFormField(
-                    keyboardType: TextInputType.text,
-                    controller: user_name,
-                    style: TextStyle(fontSize: 16),
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: 'Your username',
-                        hintStyle: TextStyle(fontSize: 16),
-                        suffixIcon: Icon(Icons.person)),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the username';
-                      }
-                     
-                      return null;
-                    },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the Age';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
+                  style: TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Your Email',
+                    hintStyle: TextStyle(fontSize: 16),
+                    suffixIcon: Icon(Icons.email),
                   ),
-                  Container(
-                    height: 20,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the Email';
+                    }
+                    if (!isValidEmail(_emailController.text)) {
+                      return 'Enter valid Email';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  keyboardType: TextInputType.phone,
+                  controller: _phoneNumberController,
+                  style: TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Phone Number',
+                    hintStyle: TextStyle(fontSize: 16),
+                    suffixIcon: Icon(Icons.phone),
                   ),
-                  TextFormField(
-                    keyboardType: TextInputType.emailAddress,
-                    controller: email,
-                    style: TextStyle(fontSize: 16),
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: 'Your email',
-                        hintStyle: TextStyle(fontSize: 16),
-                        suffixIcon: Icon(Icons.email)),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the Email';
-                      }
-                      if (!isValidEmail(email.text)) {
-                        return 'Enter valid Email';
-                      }
-                      return null;
-                    },
-                  ),
-                  Container(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    keyboardType: TextInputType.phone,
-                    controller: phonenumber,
-                    style: TextStyle(fontSize: 16),
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: 'Phone Number',
-                        hintStyle: TextStyle(fontSize: 16),
-                        suffixIcon: Icon(Icons.phone)),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the phone number';
-                      }
-                      return null;
-                    },
-                  ),
-                  Container(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    //  keyboardType: TextInputType.,
-                    obscureText: obscureText,
-                    controller: password,
-                    style: TextStyle(fontSize: 16),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Password',
-                      hintStyle: TextStyle(fontSize: 16),
-                      suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              obscureText = !obscureText;
-                            });
-                          },
-                          icon: Icon(obscureText
-                              ? Icons.visibility_off
-                              : Icons.visibility)),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the password';
-                      }
-                      if (!isPasswordConfirmed(
-                          password.text, confirmpassword.text)) {
-                        return 'Please enter matching passwords';
-                      }
-                      return null;
-                    },
-                  ),
-                  Container(
-                    height: 20,
-                  ),
-                  TextFormField(
-                      //  keyboardType: TextInputType.,
-                      obscureText: obscureText,
-                      controller: confirmpassword,
-                      style: TextStyle(fontSize: 16),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: 'Confirm Password',
-                        hintStyle: TextStyle(fontSize: 16),
-                        suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                obscureText = !obscureText;
-                              });
-                            },
-                            icon: Icon(obscureText
-                                ? Icons.visibility_off
-                                : Icons.visibility)),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the password';
-                        }
-                        return null;
-                      }),
-                  Container(
-                    height: 5,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          await validateEmail();
-                          setState(() {
-                            _isLoading = false;
-                          });
-                          if (signup) {
-                            // await newuser.storeuid(userRecord['userid']);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Diagonise()
-                                    // BottomBar(index: 0,)
-                                    ));
-                          }
-                        }
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the phone number';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  obscureText: obscureText,
+                  controller: _passwordController,
+                  style: TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Password',
+                    hintStyle: TextStyle(fontSize: 16),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          obscureText = !obscureText;
+                        });
                       },
-                      style: ElevatedButton.styleFrom(
-                        fixedSize: Size(double.maxFinite, 50),
-                        backgroundColor: MyColors.accent,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                      ),
-                      child: _isLoading
-                          ? const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(Colors.white),
-                            )
-                          : Text(
-                              'Sign Up',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
+                      icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
                     ),
                   ),
-                  Container(
-                    height: 20,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the password';
+                    } else if (value.length < 6) {
+                    return 'Password must be at least 6 characters long';
+                  }
+                    if (!isPasswordConfirmed(_passwordController.text, _confirmPasswordController.text)) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  obscureText: obscureText,
+                  controller: _confirmPasswordController,
+                  style: TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Confirm Password',
+                    hintStyle: TextStyle(fontSize: 16),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          obscureText = !obscureText;
+                        });
+                      },
+                      icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
+                    ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => LogInPage()));
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please confirm the password';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 5),
+                Container(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        await _signup();
+                      }
                     },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Aready member? ',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'LogIn',
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: MyColors.accent,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(double.maxFinite, 50),
+                      backgroundColor: MyColors.accent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
-                  )
-                ],
-              ),
-            )),
+                    child: _isLoading
+                        ? CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          )
+                        : Text(
+                            'Sign Up',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LogInPage()),
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Already a member? ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Log In',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: MyColors.accent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

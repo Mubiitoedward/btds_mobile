@@ -1,8 +1,9 @@
 import 'package:btds_mobile/Auth/login.dart';
 import 'package:btds_mobile/Darshboard/Diagonise.dart';
-import 'package:btds_mobile/Settings/settings.dart';
+import 'package:btds_mobile/Settings/settingsPage.dart';
 import 'package:btds_mobile/data/drawerss.dart';
 import 'package:btds_mobile/data/img.dart';
+import 'package:btds_mobile/screens/AboutSystem.dart';
 import 'package:btds_mobile/screens/Results.dart';
 import 'package:btds_mobile/screens/registerPatient.dart';
 import 'package:btds_mobile/screens/stories.dart';
@@ -93,7 +94,7 @@ class _DashboardState extends State<Dashboard> {
                             Container(
                               height: 10,
                             ),
-                            Text('Hi Mr Edward, ',
+                            Text('Hello There, ',
                                 style: MyText.title(context)!
                                     .copyWith(color: Colors.white)),
                             Container(
@@ -288,7 +289,7 @@ class _DashboardState extends State<Dashboard> {
                                       mini: true,
                                       backgroundColor: Colors.purple[500],
                                       onPressed: () {
-                                        Get.to(() => RegisterPatient());
+                                        Get.to(() => Aboutsystem());
                                       },
                                       child: Icon(Icons.app_registration),
                                     ),
@@ -296,7 +297,7 @@ class _DashboardState extends State<Dashboard> {
                                       height: 5,
                                     ),
                                     Text(
-                                      'RegisterP',
+                                      'About',
                                       style: MyText.medium(context)!
                                           .copyWith(color: Colors.grey),
                                     ),
@@ -340,7 +341,7 @@ class _DashboardState extends State<Dashboard> {
                                       mini: true,
                                       backgroundColor: Colors.pink[500],
                                       onPressed: () {
-                                        Get.to(() => Settings());
+                                        Get.to(() => SettingsPage());
                                       },
                                       child: Icon(Icons.settings),
                                     ),

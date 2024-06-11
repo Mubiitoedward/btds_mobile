@@ -1,6 +1,7 @@
 
 import 'package:btds_mobile/Auth/login.dart';
 import 'package:btds_mobile/Darshboard/Diagonise.dart';
+import 'package:btds_mobile/Darshboard/darshboard.dart';
 import 'package:btds_mobile/data/img.dart';
 import 'package:btds_mobile/screens/Results.dart';
 import 'package:btds_mobile/screens/registerPatient.dart';
@@ -74,12 +75,12 @@ Drawer Mydrawer(BuildContext context) {
             ),
             InkWell(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => Diagonise()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard()));
             },
             child: ListTile(
-              leading: Icon(Icons.logout_sharp, color: Colors.white),
+              leading: Icon(Icons.dashboard_rounded, color: Colors.white),
               title: Text(
-                "Diagonise",
+                "Dashboard",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -92,12 +93,12 @@ Drawer Mydrawer(BuildContext context) {
             ),
         InkWell(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPatient()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Diagonise()));
             },
             child: ListTile(
-              leading: Icon(Icons.logout_sharp, color: Colors.white),
+              leading: Icon(Icons.check, color: Colors.white),
               title: Text(
-                "Patient Reg",
+                "Diagnosis",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -113,7 +114,7 @@ Drawer Mydrawer(BuildContext context) {
               Navigator.push(context, MaterialPageRoute(builder: (context) => ResultsPage()));
             },
             child: ListTile(
-              leading: Icon(Icons.logout_sharp, color: Colors.white),
+              leading: Icon(Icons.file_copy_rounded, color: Colors.white),
               title: Text(
                 "Results",
                 style: TextStyle(
