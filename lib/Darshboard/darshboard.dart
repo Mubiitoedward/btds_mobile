@@ -4,8 +4,8 @@ import 'package:btds_mobile/Settings/settingsPage.dart';
 import 'package:btds_mobile/data/drawerss.dart';
 import 'package:btds_mobile/data/img.dart';
 import 'package:btds_mobile/screens/AboutSystem.dart';
+import 'package:btds_mobile/screens/RegisterPatient.dart';
 import 'package:btds_mobile/screens/Results.dart';
-import 'package:btds_mobile/screens/registerPatient.dart';
 import 'package:btds_mobile/screens/stories.dart';
 import 'package:btds_mobile/widget/my_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -60,7 +60,7 @@ class _DashboardState extends State<Dashboard> {
         //   )
         // ],
       ),
-     
+     drawer: Mydrawer(context),
       body: Container(
         color: Colors.grey[100],
         height: double.infinity,
@@ -319,7 +319,7 @@ class _DashboardState extends State<Dashboard> {
                                       mini: true,
                                       backgroundColor: Colors.lightGreen[500],
                                       onPressed: () {
-                                        Get.to(() => ResultsPage());
+                                        Get.to(() => Patients_Reg());
                                       },
                                       child: Icon(Icons.document_scanner),
                                     ),
@@ -327,7 +327,7 @@ class _DashboardState extends State<Dashboard> {
                                       height: 5,
                                     ),
                                     Text(
-                                      'Results',
+                                      'PatientReg',
                                       style: MyText.medium(context)!
                                           .copyWith(color: Colors.grey),
                                     ),

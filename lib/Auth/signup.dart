@@ -1,9 +1,9 @@
 import 'package:btds_mobile/Auth/login.dart';
-import 'package:btds_mobile/Darshboard/Diagonise.dart';
+import 'package:btds_mobile/Darshboard/darshboard.dart';
 import 'package:btds_mobile/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:btds_mobile/Auth/AuthService.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:btds_mobile/data/my_colors.dart';
 
 class SignPForm extends StatefulWidget {
@@ -15,16 +15,12 @@ class SignPForm extends StatefulWidget {
 
 class _SignPFormState extends State<SignPForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _userNameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
   final Snackbar snackbar = Snackbar();
 
-  final AuthService _auth = AuthService();
+  final SupabaseClient supabase = Supabase.instance.client;
   bool obscureText = true;
   bool _isLoading = false;
 
@@ -36,23 +32,23 @@ class _SignPFormState extends State<SignPForm> {
   bool isPasswordConfirmed(String password, String confirmPassword) {
     return password == confirmPassword;
   }
+  
 
   Future<void> _signup() async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
-      final user = await _auth.createUserWithEmailAndPassword(
-        _fullNameController.text,
-        _userNameController.text,
-        _ageController.text,
-        _emailController.text,
-        _phoneNumberController.text,
-        _passwordController.text,
-        _confirmPasswordController.text,
+      final response = await supabase.auth.signUp(
+        email: _emailController.text,
+        password: _passwordController.text,
       );
-      if (user != null) {
+
+      if (response.user != null) {
         snackbar.displaymessage(context, 'User Created Successfully', true);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Diagonise()),
+          MaterialPageRoute(builder: (context) => Dashboard()),
         );
       } else {
         snackbar.displaymessage(context, 'Sign Up Failed', false);
@@ -68,11 +64,7 @@ class _SignPFormState extends State<SignPForm> {
 
   @override
   void dispose() {
-    _fullNameController.dispose();
-    _userNameController.dispose();
-    _ageController.dispose();
     _emailController.dispose();
-    _phoneNumberController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -99,62 +91,6 @@ class _SignPFormState extends State<SignPForm> {
               children: [
                 SizedBox(height: 20),
                 TextFormField(
-                  keyboardType: TextInputType.text,
-                  controller: _fullNameController,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: 'Full Name',
-                    hintStyle: TextStyle(fontSize: 16),
-                    suffixIcon: Icon(Icons.person_2_outlined),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter the full name';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  keyboardType: TextInputType.text,
-                  controller: _userNameController,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: 'Your Username',
-                    hintStyle: TextStyle(fontSize: 16),
-                    suffixIcon: Icon(Icons.person),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter the username';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  keyboardType: TextInputType.number,
-                  controller: _ageController,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: 'Age',
-                    hintStyle: TextStyle(fontSize: 16),
-                    suffixIcon: Icon(Icons.lock_clock_outlined),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter the Age';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
                   keyboardType: TextInputType.emailAddress,
                   controller: _emailController,
                   style: TextStyle(fontSize: 16),
@@ -171,25 +107,6 @@ class _SignPFormState extends State<SignPForm> {
                     }
                     if (!isValidEmail(_emailController.text)) {
                       return 'Enter valid Email';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  keyboardType: TextInputType.phone,
-                  controller: _phoneNumberController,
-                  style: TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: 'Phone Number',
-                    hintStyle: TextStyle(fontSize: 16),
-                    suffixIcon: Icon(Icons.phone),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter the phone number';
                     }
                     return null;
                   },
@@ -217,10 +134,7 @@ class _SignPFormState extends State<SignPForm> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the password';
                     } else if (value.length < 6) {
-                    return 'Password must be at least 6 characters long';
-                  }
-                    if (!isPasswordConfirmed(_passwordController.text, _confirmPasswordController.text)) {
-                      return 'Passwords do not match';
+                      return 'Password must be at least 6 characters long';
                     }
                     return null;
                   },
@@ -248,18 +162,18 @@ class _SignPFormState extends State<SignPForm> {
                     if (value == null || value.isEmpty) {
                       return 'Please confirm the password';
                     }
+                    if (!isPasswordConfirmed(_passwordController.text, _confirmPasswordController.text)) {
+                      return 'Passwords do not match';
+                    }
                     return null;
                   },
                 ),
-                SizedBox(height: 5),
+                SizedBox(height: 20),
                 Container(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        setState(() {
-                          _isLoading = true;
-                        });
                         await _signup();
                       }
                     },

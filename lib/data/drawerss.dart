@@ -4,7 +4,6 @@ import 'package:btds_mobile/Darshboard/Diagonise.dart';
 import 'package:btds_mobile/Darshboard/darshboard.dart';
 import 'package:btds_mobile/data/img.dart';
 import 'package:btds_mobile/screens/Results.dart';
-import 'package:btds_mobile/screens/registerPatient.dart';
 import 'package:btds_mobile/screens/stories.dart';
 import 'package:btds_mobile/widget/my_text.dart';
 import 'package:flutter/material.dart';

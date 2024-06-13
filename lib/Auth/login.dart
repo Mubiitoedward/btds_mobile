@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:btds_mobile/data/my_colors.dart';
 import 'package:btds_mobile/widget/my_text.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LogInPage extends StatefulWidget {
   const LogInPage({Key? key}) : super(key: key);
@@ -24,38 +25,48 @@ class _LogInPageState extends State<LogInPage> {
   final TextEditingController _password = TextEditingController();
   bool obscureText = true;
   bool _isLoading = false;
-  bool login = false;
-  // final newuser = AuthenticationFunctions();
   final snackbar = Snackbar();
 
-  final _auth = AuthService();
+  final SupabaseClient supabase = Supabase.instance.client;
 
-  // final _email = TextEditingController();
-  // final _password = TextEditingController();
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$');
+    return emailRegex.hasMatch(email);
+  }
 
-  _login() async {
-    final user =
-        await _auth.loginUserWithEmailAndPassword(_email.text, _password.text);
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final response = await supabase.auth.signInWithPassword(
+        email: _email.text,
+        password: _password.text,
+      );
 
-    if (user != null) {
-      return "User Logged In";
+      if (response.user != null) {
+        snackbar.displaymessage(context, 'Logged in Successfully', true);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Dashboard()),
+        );
+      } else {
+        snackbar.displaymessage(context, 'Login Failed', false);
+      }
+    } catch (e) {
+      snackbar.displaymessage(context, 'Error: $e', false);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
   @override
   void dispose() {
-    super.dispose();
     _email.dispose();
     _password.dispose();
-  }
-
-  Map<String, dynamic> userRecord = {};
-  final userdetails = Get.put(UserDetails());
-  bool isValidEmail(String email) {
-    // Use a regular expression to validate the email format
-    final emailRegex = RegExp(
-        r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$');
-    return emailRegex.hasMatch(email);
+    super.dispose();
   }
 
   @override
@@ -113,141 +124,137 @@ class _LogInPageState extends State<LogInPage> {
       ),
       body: SingleChildScrollView(
         child: Container(
-            padding: EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 20,
+          padding: EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 20,
+                ),
+                TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _email,
+                  style: TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Email',
+                    hintStyle: TextStyle(fontSize: 16),
+                    suffixIcon: Icon(Icons.email),
                   ),
-                  TextFormField(
-                    keyboardType: TextInputType.text,
-                    controller: _email,
-                    style: TextStyle(fontSize: 16),
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: 'Email',
-                        hintStyle: TextStyle(fontSize: 16),
-                        suffixIcon: Icon(Icons.email)),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter Email';
-                      }
-                      if (!isValidEmail(_email.text)) {
-                        return 'Enter valid Email';
-                      }
-                      return null;
-                    },
-                  ),
-                  Container(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    //  keyboardType: TextInputType.,
-                    obscureText: obscureText,
-                    controller: _password,
-                    style: TextStyle(fontSize: 16),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Password',
-                      hintStyle: TextStyle(fontSize: 16),
-                      suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              obscureText = !obscureText;
-                            });
-                          },
-                          icon: Icon(obscureText
-                              ? Icons.visibility_off
-                              : Icons.visibility)),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the password';
-                      }
-                      return null;
-                    },
-                  ),
-                  Container(
-                    height: 20,
-                  ),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                        foregroundColor: Colors.transparent),
-                    onPressed: () {
-                      Get.to(ForgotPasswordPage());
-                    },
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: MyColors.accent),
-                    ),
-                  ),
-                  Container(
-                    height: 20,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          await _login();
-                          setState(() {
-                            _isLoading = false;
-                          });
-
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Dashboard()));
-                        }
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter Email';
+                    }
+                    if (!isValidEmail(_email.text)) {
+                      return 'Enter valid Email';
+                    }
+                    return null;
+                  },
+                ),
+                Container(
+                  height: 20,
+                ),
+                TextFormField(
+                  obscureText: obscureText,
+                  controller: _password,
+                  style: TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Password',
+                    hintStyle: TextStyle(fontSize: 16),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          obscureText = !obscureText;
+                        });
                       },
-                      child: Text(
-                        "Login",
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: MyColors.accent,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(10),
-                        ),
-                      ),
+                      icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
                     ),
                   ),
-                  Container(
-                    height: 20,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the password';
+                    }
+                    return null;
+                  },
+                ),
+                Container(
+                  height: 20,
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(foregroundColor: Colors.transparent),
+                  onPressed: () {
+                    Get.to(ForgotPasswordPage());
+                  },
+                  child: Text(
+                    'Forgot Password?',
+                    style: TextStyle(color: MyColors.accent),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Get.to(() => SignPForm());
+                ),
+                Container(
+                  height: 20,
+                ),
+                Container(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        await _login();
+                      }
                     },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Notyet a member? ',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'SignUp',
-                          style: TextStyle(
+                    child: _isLoading
+                        ? CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          )
+                        : Text(
+                            "Login",
+                            style: TextStyle(
                               fontSize: 16,
-                              color: MyColors.accent,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: MyColors.accent,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                  )
-                ],
-              ),
-            )),
+                  ),
+                ),
+                Container(
+                  height: 20,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Get.to(() => SignPForm());
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Not yet a member? ',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: MyColors.accent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

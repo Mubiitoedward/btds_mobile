@@ -1,7 +1,7 @@
 import 'package:btds_mobile/Darshboard/Diagonise.dart';
 import 'package:btds_mobile/data/my_colors.dart';
 import 'package:btds_mobile/screens/Results.dart';
-import 'package:btds_mobile/screens/registerPatient.dart';
+import 'package:btds_mobile/screens/stories.dart';
 import 'package:flutter/material.dart';
 
 class BottomBar extends StatefulWidget {
@@ -17,7 +17,7 @@ class _BottomBarState extends State<BottomBar> {
   List<Widget> bottomscreens = [
     Diagonise(),
     ResultsPage(),
-    RegisterPatient()
+    Stories()
   ];
   @override
   void initState() {

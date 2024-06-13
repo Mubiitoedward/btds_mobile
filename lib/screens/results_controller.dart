@@ -16,6 +16,7 @@ class ResultsController extends GetxController {
   }
 
   Future<void> fetchResults() async {
+    isLoading.value = true;
     try {
       User? user = _auth.currentUser;
       if (user != null) {
@@ -23,7 +24,7 @@ class ResultsController extends GetxController {
             .collection('users')
             .doc(user.uid)
             .collection('results');
- 
+
         QuerySnapshot querySnapshot =
             await resultsCollection.orderBy('timestamp', descending: true).get();
 
@@ -31,15 +32,15 @@ class ResultsController extends GetxController {
           return {
             'label': doc['label'],
             'confidence': doc['confidence'],
-            'recorded_at': doc['timestamp'].toDate().toString(),
+            'timestamp': doc['timestamp'].toDate().toString(),
+            // 'image_url': doc['image_url'] ?? '',
           };
         }).toList();
-
-        isLoading.value = false;
       }
     } catch (e) {
-      isLoading.value = false;
       Get.snackbar('Error', 'Failed to load results');
+    } finally {
+      isLoading.value = false;
     }
   }
 
