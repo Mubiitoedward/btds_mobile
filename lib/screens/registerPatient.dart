@@ -93,13 +93,23 @@ class _Patients_RegState extends State<Patients_Reg> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: MyColors.primaryDark,
+      appBar: new AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        toolbarHeight: 55,
         systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: MyColors.primaryDark,
+          statusBarColor: Colors.black,
           statusBarIconBrightness: Brightness.dark,
         ),
-        automaticallyImplyLeading: false,
+        title: new Text("Patient Registration", style: TextStyle(color: Colors.white)),
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.close),
+        //     onPressed: () {
+        //       Navigator.pop(context);
+        //     },
+        //   )
+        // ],
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -196,6 +206,7 @@ class _Patients_RegState extends State<Patients_Reg> {
                     hintStyle: TextStyle(fontSize: 16),
                   ),
                 ),
+                Container(height: 10,),
                 Container(
                   width: double.infinity,
                   child: ElevatedButton(

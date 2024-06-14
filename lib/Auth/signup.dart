@@ -1,6 +1,8 @@
 import 'package:btds_mobile/Auth/login.dart';
 import 'package:btds_mobile/Darshboard/darshboard.dart';
+import 'package:btds_mobile/data/img.dart';
 import 'package:btds_mobile/snackbar.dart';
+import 'package:btds_mobile/widget/my_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -80,6 +82,48 @@ class _SignPFormState extends State<SignPForm> {
           statusBarIconBrightness: Brightness.dark,
         ),
         automaticallyImplyLeading: false,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(150),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(60, 15, 0, 25),
+            alignment: Alignment.bottomLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      child: Image.asset(
+                        Img.get('BT2-01.png'),
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(width: 20),
+                    Text(
+                      "SignUP Page",
+                      style: MyText.headline(context)!.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  height: 10,
+                ),
+                Text(
+                  "Please sign up to continue",
+                  style: MyText.body1(context)!.copyWith(
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Container(
